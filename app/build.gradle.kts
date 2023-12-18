@@ -5,12 +5,12 @@ plugins {
 
 android {
     namespace = "ch.heigvd.daa.labo5"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "ch.heigvd.daa.labo5"
         minSdk = 33
-        targetSdk = 33
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
