@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.work.BackoffPolicy
@@ -25,13 +26,11 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        val adapter = GalleryAdapter()
+        val adapter = GalleryAdapter(lifecycleScope)
         val recycler = findViewById<RecyclerView>(R.id.gallery_view)
 
-        TODO("Corriger, ça fait planter l'app, à checker")
-        /*recycler.layoutManager = GridLayoutManager(this, 3)
-        recycler.adapter = adapter*/
+        recycler.layoutManager = GridLayoutManager(this, 3)
+        recycler.adapter = adapter
 
         workManager = WorkManager.getInstance(applicationContext)
         startPeriodicalImageCacheCleaningWork()

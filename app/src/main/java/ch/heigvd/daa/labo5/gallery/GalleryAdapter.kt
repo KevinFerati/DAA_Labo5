@@ -2,21 +2,25 @@ package ch.heigvd.daa.labo5.gallery;
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.RecyclerView
 import ch.heigvd.daa.labo5.R
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.net.URL
 import kotlin.concurrent.thread
 import kotlin.coroutines.coroutineContext
 
-class GalleryAdapter() : RecyclerView.Adapter<GalleryAdapter.ViewHolder>() {
+class GalleryAdapter(private val scope: LifecycleCoroutineScope) : RecyclerView.Adapter<GalleryAdapter.ViewHolder>() {
     companion object {
-        const val COUNT_IMAGES = 10;
+        const val COUNT_IMAGES = 10_000;
+
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -28,18 +32,17 @@ class GalleryAdapter() : RecyclerView.Adapter<GalleryAdapter.ViewHolder>() {
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        thread {
-            val url = URL("https://daa.iict.ch/images/$position.jpg")
-            val bytes = url.readBytes()
-            val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
-            holder.bind(bitmap)
+        val downloader = ImageDownloader()
+        scope.launch {
+            val img = downloader.getImage(position)
+            Log.d("img", "$img")
+            holder.bind(img)
         }
     }
 
     inner class ViewHolder(view: View): RecyclerView.ViewHolder(view) {
         private val imgView = view.findViewById<ImageView>(R.id.image)
         fun bind(image: Bitmap) {
-
             imgView.setImageBitmap(image)
         }
     }
