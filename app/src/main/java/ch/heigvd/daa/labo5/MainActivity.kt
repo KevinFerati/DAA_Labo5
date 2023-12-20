@@ -24,14 +24,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     private lateinit var imageHandler: ImageHandler;
+    private lateinit var galleryAdapter: GalleryAdapter;
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        val recycler = findViewById<RecyclerView>(R.id.gallery_view)
         imageHandler = ImageHandler(cacheDir, 5.minutes)
+        galleryAdapter = GalleryAdapter(lifecycleScope, imageHandler)
+        val recycler = findViewById<RecyclerView>(R.id.gallery_view)
         recycler.layoutManager = GridLayoutManager(this, 3)
-        recycler.adapter = GalleryAdapter(lifecycleScope, imageHandler)
+        recycler.adapter = galleryAdapter
 
         workManager = WorkManager.getInstance(applicationContext)
         startPeriodicalImageCacheCleaningWork()
@@ -52,10 +54,15 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        galleryAdapter.cancelAll()
+    }
+
     private fun refresh() {
         lifecycleScope.launch {
             imageHandler.deleteImagesCache()
-            findViewById<RecyclerView>(R.id.gallery_view).adapter?.notifyDataSetChanged()
+            galleryAdapter.notifyItemRangeRemoved(0, 10_000)
         }
     }
 
