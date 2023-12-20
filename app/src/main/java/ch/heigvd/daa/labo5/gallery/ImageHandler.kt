@@ -17,7 +17,6 @@ class ImageHandler(private val cacheLocation: File,
             File(cacheLocation, it).delete()
         }
     }
-
     suspend fun decodeImage(bytes: ByteArray?) = withContext(Dispatchers.Default) {
         BitmapFactory.decodeByteArray(bytes, 0, bytes?.size ?: 0)
     }
