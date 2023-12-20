@@ -15,11 +15,12 @@ import ch.heigvd.daa.labo5.R
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 import java.net.URL
 import kotlin.concurrent.thread
 import kotlin.coroutines.coroutineContext
 
-class GalleryAdapter(private val scope: LifecycleCoroutineScope) : RecyclerView.Adapter<GalleryAdapter.ViewHolder>() {
+class GalleryAdapter(private val scope: LifecycleCoroutineScope, private val downloader: ImageDownloader) : RecyclerView.Adapter<GalleryAdapter.ViewHolder>() {
     companion object {
         const val COUNT_IMAGES = 10_000;
 
@@ -34,7 +35,6 @@ class GalleryAdapter(private val scope: LifecycleCoroutineScope) : RecyclerView.
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val downloader = ImageDownloader()
         scope.launch {
             val img = downloader.getImage(position)
             holder.bind(img)

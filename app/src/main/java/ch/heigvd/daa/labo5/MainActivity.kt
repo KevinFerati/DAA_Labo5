@@ -16,8 +16,11 @@ import androidx.work.PeriodicWorkRequest
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import ch.heigvd.daa.labo5.gallery.GalleryAdapter
+import ch.heigvd.daa.labo5.gallery.ImageDownloader
 import ch.heigvd.daa.labo5.works.ImageCacheCleaner
 import java.util.concurrent.TimeUnit
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 
 class MainActivity : AppCompatActivity() {
     companion object{
@@ -26,11 +29,9 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        val adapter = GalleryAdapter(lifecycleScope)
         val recycler = findViewById<RecyclerView>(R.id.gallery_view)
-
         recycler.layoutManager = GridLayoutManager(this, 3)
-        recycler.adapter = adapter
+        recycler.adapter = GalleryAdapter(lifecycleScope, ImageDownloader(cacheDir, 5.minutes))
 
         workManager = WorkManager.getInstance(applicationContext)
         startPeriodicalImageCacheCleaningWork()
