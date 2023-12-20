@@ -8,18 +8,13 @@ import android.view.MenuItem
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.work.BackoffPolicy
-import androidx.work.Constraints
-import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.PeriodicWorkRequest
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import ch.heigvd.daa.labo5.gallery.GalleryAdapter
-import ch.heigvd.daa.labo5.gallery.ImageDownloader
+import ch.heigvd.daa.labo5.gallery.ImageHandler
 import ch.heigvd.daa.labo5.works.ImageCacheCleaner
 import java.util.concurrent.TimeUnit
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 
 class MainActivity : AppCompatActivity() {
@@ -31,7 +26,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         val recycler = findViewById<RecyclerView>(R.id.gallery_view)
         recycler.layoutManager = GridLayoutManager(this, 3)
-        recycler.adapter = GalleryAdapter(lifecycleScope, ImageDownloader(cacheDir, 5.minutes))
+        recycler.adapter = GalleryAdapter(lifecycleScope, ImageHandler(cacheDir, 5.minutes))
 
         workManager = WorkManager.getInstance(applicationContext)
         startPeriodicalImageCacheCleaningWork()

@@ -1,6 +1,5 @@
 package ch.heigvd.daa.labo5.gallery
 
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
 import kotlinx.coroutines.Dispatchers
@@ -10,16 +9,20 @@ import java.net.URL
 import java.time.Instant
 import kotlin.time.Duration
 
-class ImageDownloader(private val cacheLocation: File,
-                      private val cacheDuration: Duration)  {
+class ImageHandler(private val cacheLocation: File,
+                   private val cacheDuration: Duration)  {
+    suspend fun deleteImagesCache() = withContext(Dispatchers.IO) {
+        cacheLocation.list()?.onEach {
+            Log.d("ImageDownloader - Cache", "deleting $it")
+            File(cacheLocation, it).delete()
+        }
+    }
 
-
-
-    private suspend fun decodeImage(bytes: ByteArray?) = withContext(Dispatchers.Default) {
+    suspend fun decodeImage(bytes: ByteArray?) = withContext(Dispatchers.Default) {
         BitmapFactory.decodeByteArray(bytes, 0, bytes?.size ?: 0)
     }
 
-    private suspend fun getOrCacheImage(position: Int) : ByteArray = withContext(Dispatchers.IO) {
+    suspend fun getOrCacheImage(position: Int) : ByteArray = withContext(Dispatchers.IO) {
         val cachedImage = File(cacheLocation, "$position")
         // lastModified returns 0 if it does not exist
         val expirationEpoch = cachedImage.lastModified() + cacheDuration.inWholeMilliseconds
@@ -38,10 +41,5 @@ class ImageDownloader(private val cacheLocation: File,
         return@withContext cachedImage.readBytes()
     }
 
-    suspend fun getImage(position: Int): Bitmap = withContext(Dispatchers.Main) {
-        val imgBytes = getOrCacheImage(position)
-        val bitmap = decodeImage(imgBytes)
-        return@withContext bitmap
-    }
 
 }

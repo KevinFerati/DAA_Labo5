@@ -1,9 +1,6 @@
 package ch.heigvd.daa.labo5.gallery;
 
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.transition.Visibility
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,15 +9,9 @@ import android.widget.ProgressBar
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.RecyclerView
 import ch.heigvd.daa.labo5.R
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.io.File
-import java.net.URL
-import kotlin.concurrent.thread
-import kotlin.coroutines.coroutineContext
 
-class GalleryAdapter(private val scope: LifecycleCoroutineScope, private val downloader: ImageDownloader) : RecyclerView.Adapter<GalleryAdapter.ViewHolder>() {
+class GalleryAdapter(private val scope: LifecycleCoroutineScope, private val downloader: ImageHandler) : RecyclerView.Adapter<GalleryAdapter.ViewHolder>() {
     companion object {
         const val COUNT_IMAGES = 10_000;
 
@@ -36,8 +27,9 @@ class GalleryAdapter(private val scope: LifecycleCoroutineScope, private val dow
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         scope.launch {
-            val img = downloader.getImage(position)
-            holder.bind(img)
+            val imgBytes = downloader.getOrCacheImage(position)
+            val bitmap = downloader.decodeImage(imgBytes)
+            holder.bind(bitmap)
         }
     }
 
