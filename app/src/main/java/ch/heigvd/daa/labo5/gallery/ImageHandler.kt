@@ -4,6 +4,7 @@ import android.graphics.BitmapFactory
 import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.yield
 import java.io.File
 import java.net.URL
 import java.time.Instant
@@ -15,6 +16,7 @@ class ImageHandler(private val cacheLocation: File,
         cacheLocation.list()?.onEach {
             Log.d("ImageDownloader - Cache", "deleting $it")
             File(cacheLocation, it).delete()
+            yield()
         }
     }
     suspend fun decodeImage(bytes: ByteArray?) = withContext(Dispatchers.Default) {
@@ -26,7 +28,7 @@ class ImageHandler(private val cacheLocation: File,
         // lastModified returns 0 if it does not exist
         val expirationEpoch = cachedImage.lastModified() + cacheDuration.inWholeMilliseconds
         val currentEpoch = Instant.now().toEpochMilli()
-
+        yield()
         // cache has expired or file does not exist => download it and cache it
         if (expirationEpoch < currentEpoch)  {
             Log.d("ImageDownloader - Cache", "Cache miss for $position")
