@@ -2,11 +2,13 @@ package ch.heigvd.daa.labo5.gallery;
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.transition.Visibility
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.ProgressBar
 import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.RecyclerView
 import ch.heigvd.daa.labo5.R
@@ -35,15 +37,17 @@ class GalleryAdapter(private val scope: LifecycleCoroutineScope) : RecyclerView.
         val downloader = ImageDownloader()
         scope.launch {
             val img = downloader.getImage(position)
-            Log.d("img", "$img")
             holder.bind(img)
         }
     }
 
     inner class ViewHolder(view: View): RecyclerView.ViewHolder(view) {
         private val imgView = view.findViewById<ImageView>(R.id.image)
+        private val progressBar = view.findViewById<ProgressBar>(R.id.progressbar);
         fun bind(image: Bitmap) {
             imgView.setImageBitmap(image)
+            progressBar.visibility = View.GONE
+            imgView.visibility = View.VISIBLE
         }
     }
 }
