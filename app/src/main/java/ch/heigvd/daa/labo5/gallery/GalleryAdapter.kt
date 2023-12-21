@@ -13,7 +13,7 @@ import ch.heigvd.daa.labo5.R
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
-class GalleryAdapter(private val scope: LifecycleCoroutineScope, private val handler: ImageHandler) : RecyclerView.Adapter<GalleryAdapter.ViewHolder>() {
+class GalleryAdapter(private val scope: LifecycleCoroutineScope) : RecyclerView.Adapter<GalleryAdapter.ViewHolder>() {
     companion object {
         const val COUNT_IMAGES = 10_000;
     }
@@ -40,8 +40,8 @@ class GalleryAdapter(private val scope: LifecycleCoroutineScope, private val han
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         Log.d("GalleryAdapter", "Job started for ${holder.adapterPosition}")
         holder.currentJob = scope.launch {
-            val imgBytes = handler.getOrCacheImage(position)
-            val bitmap = handler.decodeImage(imgBytes)
+            val imgBytes = ImageHandler.getOrCacheImage(position)
+            val bitmap = ImageHandler.decodeImage(imgBytes)
             holder.bind(bitmap)
         }
     }

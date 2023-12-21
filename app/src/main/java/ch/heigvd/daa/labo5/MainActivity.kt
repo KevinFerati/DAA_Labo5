@@ -8,6 +8,7 @@ import android.view.MenuItem
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.work.Data
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
@@ -23,20 +24,22 @@ class MainActivity : AppCompatActivity() {
         lateinit var workManager: WorkManager
     }
 
-    private lateinit var imageHandler: ImageHandler;
     private lateinit var galleryAdapter: GalleryAdapter;
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        imageHandler = ImageHandler(cacheDir, 5.minutes)
-        galleryAdapter = GalleryAdapter(lifecycleScope, imageHandler)
+
+        ImageHandler.setCacheLocation(cacheDir)
+
+        galleryAdapter = GalleryAdapter(lifecycleScope)
         val recycler = findViewById<RecyclerView>(R.id.gallery_view)
         recycler.layoutManager = GridLayoutManager(this, 3)
         recycler.adapter = galleryAdapter
 
         workManager = WorkManager.getInstance(applicationContext)
         startPeriodicalImageCacheCleaningWork()
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -60,10 +63,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun refresh() {
-        lifecycleScope.launch {
-            imageHandler.deleteImagesCache()
-            galleryAdapter.notifyItemRangeRemoved(0, 10_000)
-        }
+        val imageCacheCleaner = OneTimeWorkRequestBuilder<ImageCacheCleaner>().build()
+        workManager.enqueue(imageCacheCleaner)
+        galleryAdapter.notifyDataSetChanged()
     }
 
     private fun startPeriodicalImageCacheCleaningWork(){
