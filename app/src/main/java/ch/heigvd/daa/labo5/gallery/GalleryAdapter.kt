@@ -20,7 +20,8 @@ class GalleryAdapter(private val scope: LifecycleCoroutineScope) : RecyclerView.
         const val COUNT_IMAGES = 10_000;
     }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        return ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item, parent, false))
+        return ViewHolder(LayoutInflater.from(parent.context)
+            .inflate(R.layout.list_item, parent, false))
     }
 
     override fun getItemCount(): Int {
