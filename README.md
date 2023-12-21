@@ -18,7 +18,8 @@
 
 # Questions 4
 ## 4.1 Lors du lancement de la tâche ponctuelle, comment pouvons-nous faire en sorte que la galerie soit rafraîchie ?
+En appellant ```galleryAdapter.notifyDataSetChanged()```. L'adapter de la liste est averti que le dataset a été modifié.
 
 
 ## 4.2 Comment pouvons-nous nous assurer que la tâche périodique ne soit pas enregistrée plusieurs fois ? Vous expliquerez comment la librairie WorkManager procède pour enregistrer les différentes tâches périodiques et en particulier comment celles-ci sont ré-enregistrées lorsque le téléphone est redémarré.
-
+Le WorkManager a sa propre db SQLite, dans laquelle elle stocke les dernières exécutions. Elle peut donc les réinscrire lorsque le téléphone redémarre.
