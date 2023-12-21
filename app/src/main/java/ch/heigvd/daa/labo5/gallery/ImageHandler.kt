@@ -15,10 +15,8 @@ object ImageHandler {
     private lateinit var cacheLocation: File
     private var cacheDuration: Duration = 5.minutes
 
-
     fun setCacheLocation(cacheLocation: File) {
         this.cacheLocation = cacheLocation
-
     }
 
     fun deleteImagesCache() {
@@ -42,6 +40,7 @@ object ImageHandler {
         if (expirationEpoch < currentEpoch) {
             Log.d("ImageDownloader - Cache", "Cache miss for $position")
             val img = URL("https://daa.iict.ch/images/$position.jpg").readBytes()
+            yield()
             cachedImage.writeBytes(img)
             return@withContext img
         }

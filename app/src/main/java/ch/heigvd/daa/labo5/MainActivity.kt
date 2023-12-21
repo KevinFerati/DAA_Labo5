@@ -56,12 +56,6 @@ class MainActivity : AppCompatActivity() {
             else -> super.onOptionsItemSelected(item)
         }
     }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        galleryAdapter.cancelAll()
-    }
-
     private fun refresh() {
         val imageCacheCleaner = OneTimeWorkRequestBuilder<ImageCacheCleaner>().build()
         workManager.enqueue(imageCacheCleaner)

@@ -11,17 +11,14 @@ import androidx.lifecycle.LifecycleCoroutineScope
 import androidx.recyclerview.widget.RecyclerView
 import ch.heigvd.daa.labo5.R
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.launch
 
 class GalleryAdapter(private val scope: LifecycleCoroutineScope) : RecyclerView.Adapter<GalleryAdapter.ViewHolder>() {
     companion object {
         const val COUNT_IMAGES = 10_000;
     }
-
-    public fun cancelAll() {
-
-    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         return ViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.list_item, parent, false))
     }
@@ -32,14 +29,12 @@ class GalleryAdapter(private val scope: LifecycleCoroutineScope) : RecyclerView.
 
     override fun onViewRecycled(holder: ViewHolder) {
         super.onViewRecycled(holder)
-        if (holder.currentJob?.isCompleted != true) {
-            holder.currentJob?.cancel()
-            Log.d("GalleryAdapter", "Job cancelled for ${holder.adapterPosition}")
-        }
+        holder.currentTask?.cancel()
     }
+
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         Log.d("GalleryAdapter", "Job started for ${holder.adapterPosition}")
-        holder.currentJob = scope.launch {
+        holder.currentTask = scope.launch {
             val imgBytes = ImageHandler.getOrCacheImage(position)
             val bitmap = ImageHandler.decodeImage(imgBytes)
             holder.bind(bitmap)
@@ -49,8 +44,7 @@ class GalleryAdapter(private val scope: LifecycleCoroutineScope) : RecyclerView.
     inner class ViewHolder(view: View): RecyclerView.ViewHolder(view) {
         private val imgView = view.findViewById<ImageView>(R.id.image)
         private val progressBar = view.findViewById<ProgressBar>(R.id.progressbar)
-        var currentJob: Job? = null;
-
+        var currentTask: Job? = null;
         fun bind(image: Bitmap) {
             imgView.setImageBitmap(image)
             progressBar.visibility = View.GONE
